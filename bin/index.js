@@ -5,6 +5,8 @@ const packageCheck = require("../checks/packageCheck");
 const buildCheck = require("../checks/buildCheck");
 const gitignoreCheck = require("../checks/gitignoreCheck");
 const gitignore = gitignoreCheck();
+const securityCheck = require("../checks/securityCheck");
+const security = securityCheck();
 
 console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -42,4 +44,11 @@ if (!gitignore.exists) {
     if (!gitignore.hasEnv) {
         logger.warning(".env not ignored");
     }
+}
+
+// build security check
+if (security.secure) {
+    logger.success("No weak secrets detected");
+} else {
+    logger.warning(security.reason);
 }
