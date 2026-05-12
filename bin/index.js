@@ -3,6 +3,8 @@
 const logger = require("../utils/logger");
 const packageCheck = require("../checks/packageCheck");
 const buildCheck = require("../checks/buildCheck");
+const gitignoreCheck = require("../checks/gitignoreCheck");
+const gitignore = gitignoreCheck();
 
 console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -24,4 +26,19 @@ if (buildCheck()) {
     logger.success("Build script exists");
 } else {
     logger.warning("Build script missing");
+}
+
+if (!gitignore.exists) {
+    logger.error(".gitignore missing");
+} else {
+
+    logger.success(".gitignore found");
+
+    if (!gitignore.hasNodeModules) {
+        logger.warning("node_modules not ignored");
+    }
+
+    if (!gitignore.hasEnv) {
+        logger.warning(".env not ignored");
+    }
 }
