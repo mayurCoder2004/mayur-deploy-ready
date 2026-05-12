@@ -33,3 +33,5 @@ function securityCheck() {
         secure: true
     };
 }
+
+module.exports = securityCheck;
