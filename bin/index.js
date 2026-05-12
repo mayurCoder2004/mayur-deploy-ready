@@ -28,6 +28,7 @@ if (buildCheck()) {
     logger.warning("Build script missing");
 }
 
+// build .gitignore check
 if (!gitignore.exists) {
     logger.error(".gitignore missing");
 } else {
