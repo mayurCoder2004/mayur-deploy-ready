@@ -2,6 +2,7 @@
 
 const logger = require("../utils/logger");
 
+const command = process.argv[2];
 const packageCheck = require("../checks/packageCheck");
 const buildCheck = require("../checks/buildCheck");
 const gitignoreCheck = require("../checks/gitignoreCheck");
@@ -18,6 +19,27 @@ const statsManager = require("../utils/statsManager");
 const gitignore = gitignoreCheck();
 const security = securityCheck();
 const frameworks = frameworkCheck();
+
+const fixGitignore = require("../fixes/fixGitignore");
+const fixRoutes = require("../fixes/fixRoutes");
+const fixEnvExample = require("../fixes/fixEnvExample");
+
+/* FIX MODE */
+
+if (command === "fix") {
+
+    console.log(`
+━━━━━━━━━━━━━━━━━━━━━━
+🛠 DEPLOY READY FIX
+━━━━━━━━━━━━━━━━━━━━━━
+`);
+
+    fixGitignore();
+    fixRoutes();
+    fixEnvExample();
+
+    process.exit();
+}
 
 console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━
