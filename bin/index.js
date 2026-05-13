@@ -4,6 +4,7 @@ const logger = require("../utils/logger");
 
 const command = process.argv[2];
 const isJsonMode = process.argv.includes("--json");
+const isCiMode = process.argv.includes("--ci");
 
 const packageCheck = require("../checks/packageCheck");
 const buildCheck = require("../checks/buildCheck");
@@ -463,4 +464,17 @@ if (finalScore >= 85) {
 } else {
 
     console.log("🔴 Unsafe Deployment");
+
+    /* CI/CD MODE */
+    if (isCiMode) {
+
+        if (finalScore >= 85) {
+
+            process.exit(0);
+
+        } else {
+
+            process.exit(1);
+        }
+    }
 }
