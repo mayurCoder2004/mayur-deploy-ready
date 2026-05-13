@@ -25,12 +25,15 @@ const fixEnvExample = require("../fixes/fixEnvExample");
 const fixDockerfile = require("../fixes/fixDockerfile");
 const fixDockerignore = require("../fixes/fixDockerignore");
 const fixPackageScripts = require("../fixes/fixPackageScripts");
+const fixVercelConfig = require("../fixes/fixVercelConfig");
+const fixRailwayConfig = require("../fixes/fixRailwayConfig");
 
 const gitignore = gitignoreCheck();
 const security = securityCheck();
 const frameworks = frameworkCheck();
 
 const dockerCheck = require("../checks/dockerCheck");
+const platformCheck = require("../checks/platformCheck");
 const dockerWarnings = dockerCheck();
 
 const results = [];
@@ -51,6 +54,8 @@ if (command === "fix") {
     fixDockerfile();
     fixDockerignore();
     fixPackageScripts(frameworks);
+    fixVercelConfig();
+    fixRailwayConfig();
 
     process.exit();
 }
@@ -421,6 +426,47 @@ dockerWarnings.forEach((warning) => {
     scoreManager.deduct(5);
 });
 
+/* Platform deployment checks */
+
+const platformWarnings = platformCheck(frameworks);
+
+platformWarnings.forEach((warning) => {
+
+    if (!isJsonMode) {
+
+        logger.warning(warning);
+
+        if (warning === "vercel.json missing") {
+
+            showSuggestion(
+                "Create vercel.json:",
+                `{
+  "version": 2
+}`
+            );
+        }
+
+        if (warning === "railway.json missing") {
+
+            showSuggestion(
+                "Create railway.json:",
+                `{
+  "$schema": "https://railway.app/railway.schema.json"
+}`
+            );
+        }
+    }
+
+    results.push({
+        type: "warning",
+        message: warning
+    });
+
+    statsManager.addWarning();
+
+    scoreManager.deduct(5);
+});
+
 /* FINAL RESULTS */
 
 const finalScore = scoreManager.getScore();
@@ -464,17 +510,18 @@ if (finalScore >= 85) {
 } else {
 
     console.log("🔴 Unsafe Deployment");
+}
 
-    /* CI/CD MODE */
-    if (isCiMode) {
+/* CI/CD MODE */
 
-        if (finalScore >= 85) {
+if (isCiMode) {
 
-            process.exit(0);
+    if (finalScore >= 85) {
 
-        } else {
+        process.exit(0);
 
-            process.exit(1);
-        }
+    } else {
+
+        process.exit(1);
     }
 }
