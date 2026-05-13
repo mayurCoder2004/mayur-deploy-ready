@@ -6,11 +6,11 @@ const packageCheck = require("../checks/packageCheck");
 const buildCheck = require("../checks/buildCheck");
 const gitignoreCheck = require("../checks/gitignoreCheck");
 const securityCheck = require("../checks/securityCheck");
-
 const scoreManager = require("../utils/scoreManager");
-
 const gitignore = gitignoreCheck();
 const security = securityCheck();
+const frameworkCheck = require("../checks/frameworkCheck");
+const frameworks = frameworkCheck();
 
 console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -66,6 +66,16 @@ if (security.secure) {
 
     logger.warning(security.reason);
     scoreManager.deduct(20);
+}
+
+// framework check
+if (frameworks && frameworks.length > 0) {
+    logger.success(
+        `Framework Detected: ${frameworks.join(" + ")}`
+    );
+} else {
+
+    logger.warning("No framework detected");
 }
 
 /* final score */
