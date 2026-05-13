@@ -7,7 +7,8 @@
     "mayur-deploy-ready": "./bin/index.js"
   },
   "scripts": {
-    "dev": "nodemon bin/index.js"
+    "dev": "nodemon bin/index.js",
+    "start": "node index.js"
   },
   "keywords": [
     "deployment",

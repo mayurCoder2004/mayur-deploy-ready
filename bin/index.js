@@ -23,6 +23,7 @@ const fixRoutes = require("../fixes/fixRoutes");
 const fixEnvExample = require("../fixes/fixEnvExample");
 const fixDockerfile = require("../fixes/fixDockerfile");
 const fixDockerignore = require("../fixes/fixDockerignore");
+const fixPackageScripts = require("../fixes/fixPackageScripts");
 
 const gitignore = gitignoreCheck();
 const security = securityCheck();
@@ -48,6 +49,7 @@ if (command === "fix") {
     fixEnvExample();
     fixDockerfile();
     fixDockerignore();
+    fixPackageScripts(frameworks);
 
     process.exit();
 }
