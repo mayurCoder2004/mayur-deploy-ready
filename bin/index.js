@@ -11,6 +11,8 @@ const gitignore = gitignoreCheck();
 const security = securityCheck();
 const frameworkCheck = require("../checks/frameworkCheck");
 const frameworks = frameworkCheck();
+const reactChecks = require("../checks/frameworks/reactChecks");
+const expressChecks = require("../checks/frameworks/expressChecks");
 
 console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━
@@ -76,6 +78,32 @@ if (frameworks && frameworks.length > 0) {
 } else {
 
     logger.warning("No framework detected");
+}
+
+// React checks
+if (frameworks.includes("React")) {
+
+    const reactWarnings = reactChecks();
+
+    reactWarnings.forEach((warning) => {
+
+        logger.warning(warning);
+
+        scoreManager.deduct(5);
+    });
+}
+
+// Express checks
+if (frameworks.includes("Express")) {
+
+    const expressWarnings = expressChecks();
+
+    expressWarnings.forEach((warning) => {
+
+        logger.warning(warning);
+
+        scoreManager.deduct(5);
+    });
 }
 
 /* final score */
