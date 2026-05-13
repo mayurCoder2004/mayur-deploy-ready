@@ -3,6 +3,8 @@
 const logger = require("../utils/logger");
 
 const command = process.argv[2];
+const isJsonMode = process.argv.includes("--json");
+
 const packageCheck = require("../checks/packageCheck");
 const buildCheck = require("../checks/buildCheck");
 const gitignoreCheck = require("../checks/gitignoreCheck");
@@ -16,13 +18,20 @@ const scoreManager = require("../utils/scoreManager");
 const showSuggestion = require("../utils/suggestions");
 const statsManager = require("../utils/statsManager");
 
+const fixGitignore = require("../fixes/fixGitignore");
+const fixRoutes = require("../fixes/fixRoutes");
+const fixEnvExample = require("../fixes/fixEnvExample");
+const fixDockerfile = require("../fixes/fixDockerfile");
+const fixDockerignore = require("../fixes/fixDockerignore");
+
 const gitignore = gitignoreCheck();
 const security = securityCheck();
 const frameworks = frameworkCheck();
 
-const fixGitignore = require("../fixes/fixGitignore");
-const fixRoutes = require("../fixes/fixRoutes");
-const fixEnvExample = require("../fixes/fixEnvExample");
+const dockerCheck = require("../checks/dockerCheck");
+const dockerWarnings = dockerCheck();
+
+const results = [];
 
 /* FIX MODE */
 
@@ -37,33 +46,57 @@ if (command === "fix") {
     fixGitignore();
     fixRoutes();
     fixEnvExample();
+    fixDockerfile();
+    fixDockerignore();
 
     process.exit();
 }
 
-console.log(`
+/* CLI HEADER */
+
+if (!isJsonMode) {
+
+    console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━
 🚀 DEPLOY READY
 ━━━━━━━━━━━━━━━━━━━━━━
 `);
 
-logger.info("Running Deploy Ready Checks...\n");
+    logger.info("Running Deploy Ready Checks...\n");
+}
 
 /* package.json check */
 
 if (packageCheck()) {
 
-    logger.success("package.json found");
+    if (!isJsonMode) {
+        logger.success("package.json found");
+    }
+
+    results.push({
+        type: "success",
+        message: "package.json found"
+    });
+
     statsManager.addPass();
 
 } else {
 
-    logger.error("package.json missing");
+    if (!isJsonMode) {
+        logger.error("package.json missing");
+    }
 
-    showSuggestion(
-        "Create package.json:",
-        `npm init -y`
-    );
+    results.push({
+        type: "error",
+        message: "package.json missing"
+    });
+
+    if (!isJsonMode) {
+        showSuggestion(
+            "Create package.json:",
+            `npm init -y`
+        );
+    }
 
     statsManager.addError();
 
@@ -74,17 +107,32 @@ if (packageCheck()) {
 
 if (buildCheck()) {
 
-    logger.success("Build script exists");
+    if (!isJsonMode) {
+        logger.success("Build script exists");
+    }
+
+    results.push({
+        type: "success",
+        message: "Build script exists"
+    });
+
     statsManager.addPass();
 
 } else {
 
-    logger.warning("Build script missing");
+    if (!isJsonMode) {
+        logger.warning("Build script missing");
 
-    showSuggestion(
-        "Add this inside package.json scripts:",
-        `"build": "vite build"`
-    );
+        showSuggestion(
+            "Add this inside package.json scripts:",
+            `"build": "vite build"`
+        );
+    }
+
+    results.push({
+        type: "warning",
+        message: "Build script missing"
+    });
 
     statsManager.addWarning();
 
@@ -95,14 +143,22 @@ if (buildCheck()) {
 
 if (!gitignore.exists) {
 
-    logger.error(".gitignore missing");
+    if (!isJsonMode) {
 
-    showSuggestion(
-        "Create .gitignore file with:",
-        `node_modules
+        logger.error(".gitignore missing");
+
+        showSuggestion(
+            "Create .gitignore file with:",
+            `node_modules
 .env
 dist`
-    );
+        );
+    }
+
+    results.push({
+        type: "error",
+        message: ".gitignore missing"
+    });
 
     statsManager.addError();
 
@@ -110,17 +166,33 @@ dist`
 
 } else {
 
-    logger.success(".gitignore found");
+    if (!isJsonMode) {
+        logger.success(".gitignore found");
+    }
+
+    results.push({
+        type: "success",
+        message: ".gitignore found"
+    });
+
     statsManager.addPass();
 
     if (!gitignore.hasNodeModules) {
 
-        logger.warning("node_modules not ignored");
+        if (!isJsonMode) {
 
-        showSuggestion(
-            "Add this to .gitignore:",
-            `node_modules`
-        );
+            logger.warning("node_modules not ignored");
+
+            showSuggestion(
+                "Add this to .gitignore:",
+                `node_modules`
+            );
+        }
+
+        results.push({
+            type: "warning",
+            message: "node_modules not ignored"
+        });
 
         statsManager.addWarning();
 
@@ -129,12 +201,20 @@ dist`
 
     if (!gitignore.hasEnv) {
 
-        logger.warning(".env not ignored");
+        if (!isJsonMode) {
 
-        showSuggestion(
-            "Add this to .gitignore:",
-            `.env`
-        );
+            logger.warning(".env not ignored");
+
+            showSuggestion(
+                "Add this to .gitignore:",
+                `.env`
+            );
+        }
+
+        results.push({
+            type: "warning",
+            message: ".env not ignored"
+        });
 
         statsManager.addWarning();
 
@@ -146,28 +226,44 @@ dist`
 
 if (security.secure) {
 
-    logger.success("No weak secrets detected");
+    if (!isJsonMode) {
+        logger.success("No weak secrets detected");
+    }
+
+    results.push({
+        type: "success",
+        message: "No weak secrets detected"
+    });
+
     statsManager.addPass();
 
 } else {
 
-    logger.warning(security.reason);
+    if (!isJsonMode) {
 
-    if (security.reason === ".env missing") {
+        logger.warning(security.reason);
 
-        showSuggestion(
-            "Create .env file:",
-            `PORT=5000
+        if (security.reason === ".env missing") {
+
+            showSuggestion(
+                "Create .env file:",
+                `PORT=5000
 JWT_SECRET=your_secret`
-        );
+            );
 
-    } else {
+        } else {
 
-        showSuggestion(
-            "Use stronger secrets:",
-            `JWT_SECRET=your_super_secure_secret`
-        );
+            showSuggestion(
+                "Use stronger secrets:",
+                `JWT_SECRET=your_super_secure_secret`
+            );
+        }
     }
+
+    results.push({
+        type: "warning",
+        message: security.reason
+    });
 
     statsManager.addWarning();
 
@@ -178,15 +274,29 @@ JWT_SECRET=your_secret`
 
 if (frameworks && frameworks.length > 0) {
 
-    logger.success(
-        `Framework Detected: ${frameworks.join(" + ")}`
-    );
+    if (!isJsonMode) {
+        logger.success(
+            `Framework Detected: ${frameworks.join(" + ")}`
+        );
+    }
+
+    results.push({
+        type: "success",
+        message: `Framework Detected: ${frameworks.join(" + ")}`
+    });
 
     statsManager.addPass();
 
 } else {
 
-    logger.warning("No framework detected");
+    if (!isJsonMode) {
+        logger.warning("No framework detected");
+    }
+
+    results.push({
+        type: "warning",
+        message: "No framework detected"
+    });
 
     statsManager.addWarning();
 
@@ -201,23 +311,31 @@ if (frameworks.includes("React")) {
 
     reactWarnings.forEach((warning) => {
 
-        logger.warning(warning);
+        if (!isJsonMode) {
 
-        if (warning === "Vite config missing") {
+            logger.warning(warning);
 
-            showSuggestion(
-                "Create Vite config file:",
-                `vite.config.js`
-            );
+            if (warning === "Vite config missing") {
+
+                showSuggestion(
+                    "Create Vite config file:",
+                    `vite.config.js`
+                );
+            }
+
+            if (warning === "src folder missing") {
+
+                showSuggestion(
+                    "Create source folder:",
+                    `mkdir src`
+                );
+            }
         }
 
-        if (warning === "src folder missing") {
-
-            showSuggestion(
-                "Create source folder:",
-                `mkdir src`
-            );
-        }
+        results.push({
+            type: "warning",
+            message: warning
+        });
 
         statsManager.addWarning();
 
@@ -233,23 +351,31 @@ if (frameworks.includes("Express")) {
 
     expressWarnings.forEach((warning) => {
 
-        logger.warning(warning);
+        if (!isJsonMode) {
 
-        if (warning === "start script missing") {
+            logger.warning(warning);
 
-            showSuggestion(
-                "Add this to package.json scripts:",
-                `"start": "node server.js"`
-            );
+            if (warning === "start script missing") {
+
+                showSuggestion(
+                    "Add this to package.json scripts:",
+                    `"start": "node server.js"`
+                );
+            }
+
+            if (warning === "routes folder missing") {
+
+                showSuggestion(
+                    "Create routes folder:",
+                    `mkdir routes`
+                );
+            }
         }
 
-        if (warning === "routes folder missing") {
-
-            showSuggestion(
-                "Create routes folder:",
-                `mkdir routes`
-            );
-        }
+        results.push({
+            type: "warning",
+            message: warning
+        });
 
         statsManager.addWarning();
 
@@ -257,10 +383,60 @@ if (frameworks.includes("Express")) {
     });
 }
 
-/* deployment readiness level */
+// Docker checks
+dockerWarnings.forEach((warning) => {
+
+    if (!isJsonMode) {
+
+        logger.warning(warning);
+
+        if (warning === "Dockerfile missing") {
+
+            showSuggestion(
+                "Create Dockerfile:",
+                `FROM node:18`
+            );
+        }
+
+        if (warning === ".dockerignore missing") {
+
+            showSuggestion(
+                "Create .dockerignore:",
+                `node_modules
+.env`
+            );
+        }
+    }
+
+    results.push({
+        type: "warning",
+        message: warning
+    });
+
+    statsManager.addWarning();
+
+    scoreManager.deduct(5);
+});
+
+/* FINAL RESULTS */
 
 const finalScore = scoreManager.getScore();
 const stats = statsManager.getStats();
+
+/* JSON MODE */
+
+if (isJsonMode) {
+
+    console.log(JSON.stringify({
+        score: finalScore,
+        stats,
+        results
+    }, null, 2));
+
+    process.exit();
+}
+
+/* NORMAL MODE */
 
 console.log(`
 ━━━━━━━━━━━━━━━━━━━━━━
