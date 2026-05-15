@@ -5,7 +5,6 @@
 **Analyze, score, and fix your project's deployment readiness — before it hits production.**
 
 [![npm version](https://img.shields.io/npm/v/mayur-deploy-ready.svg)](https://www.npmjs.com/package/mayur-deploy-ready)
-[![npm downloads](https://img.shields.io/npm/dt/mayur-deploy-ready.svg)](https://www.npmjs.com/package/mayur-deploy-ready)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green)](https://nodejs.org/)
 
