@@ -8,6 +8,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-green)](https://nodejs.org/)
 
+
 A zero-config CLI tool that detects missing deployment configurations, Docker setup issues, security vulnerabilities, and platform-specific requirements — all before you push to production.
 
 [Installation](#-installation) · [Usage](#-usage) · [Features](#-features) · [Project Structure](#-project-structure) · [Contributing](#-contributing)
