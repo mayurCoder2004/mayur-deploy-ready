@@ -3,22 +3,18 @@
   "version": "1.0.0",
   "description": "CLI tool to analyze whether your project is deployment ready",
   "main": "index.js",
-
   "bin": {
     "mayur-deploy-ready": "./bin/index.js"
   },
-
   "files": [
     "bin",
     "checks",
     "fixes",
     "utils"
   ],
-
   "scripts": {
     "dev": "nodemon bin/index.js"
   },
-
   "keywords": [
     "deployment",
     "cli",
@@ -31,27 +27,20 @@
     "devops",
     "automation"
   ],
-
   "author": "Mayur Pawar",
-
   "license": "MIT",
-
   "repository": {
     "type": "git",
     "url": "https://github.com/mayurCoder2004/mayur-deploy-ready.git"
   },
-
   "bugs": {
     "url": "https://github.com/mayurCoder2004/mayur-deploy-ready/issues"
   },
-
   "homepage": "https://github.com/mayurCoder2004/mayur-deploy-ready#readme",
-
   "dependencies": {
     "chalk": "^5.3.0",
     "commander": "^12.0.0"
   },
-
   "engines": {
     "node": ">=18"
   }
