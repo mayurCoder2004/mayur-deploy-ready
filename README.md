@@ -4,9 +4,10 @@
 
 **Analyze, score, and fix your project's deployment readiness — before it hits production.**
 
+[![npm version](https://img.shields.io/npm/v/mayur-deploy-ready.svg)](https://www.npmjs.com/package/mayur-deploy-ready)
+[![npm downloads](https://img.shields.io/npm/dm/mayur-deploy-ready.svg)](https://www.npmjs.com/package/mayur-deploy-ready)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-%3E%3D18-brightgreen?style=flat-square&logo=node.js)](https://nodejs.org/)
-![Status](https://img.shields.io/badge/Status-In%20Development-blue?style=flat-square)
 
 A zero-config CLI tool that detects missing deployment configurations, Docker setup issues, security vulnerabilities, and platform-specific requirements — all before you push to production.
 
@@ -33,30 +34,16 @@ A zero-config CLI tool that detects missing deployment configurations, Docker se
 
 ## 📦 Installation
 
-### Installation from Source
-
-Since this package is not yet published to npm, install it locally:
-
-```bash
-# Clone the repository
-git clone https://github.com/mayurCoder2004/mayur-deploy-ready.git
-
-# Navigate to the directory
-cd mayur-deploy-ready
-
-# Install dependencies
-npm install
-
-# Link globally to use the CLI
-npm link
-```
-
-### After Publishing to npm
-
-Once published, you can install globally:
+### Global Installation (Recommended)
 
 ```bash
 npm install -g mayur-deploy-ready
+```
+
+### Local Installation
+
+```bash
+npm install --save-dev mayur-deploy-ready
 ```
 
 **Requirements:** Node.js >= 18
