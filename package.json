@@ -4,7 +4,7 @@
   "description": "CLI tool to analyze whether your project is deployment ready",
   "main": "index.js",
   "bin": {
-    "mayur-deploy-ready": "./bin/index.js"
+    "mayur-deploy-ready": "bin/index.js"
   },
   "files": [
     "bin",
@@ -31,7 +31,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mayurCoder2004/mayur-deploy-ready.git"
+    "url": "git+https://github.com/mayurCoder2004/mayur-deploy-ready.git"
   },
   "bugs": {
     "url": "https://github.com/mayurCoder2004/mayur-deploy-ready/issues"
