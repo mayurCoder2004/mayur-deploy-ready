@@ -15,6 +15,7 @@ const buildCheck = require("../checks/buildCheck");
 const gitignoreCheck = require("../checks/gitignoreCheck");
 const securityCheck = require("../checks/securityCheck");
 const frameworkCheck = require("../checks/frameworkCheck");
+const securityScanner = require("../checks/securityScanner");
 
 const reactChecks = require("../checks/frameworks/reactChecks");
 const expressChecks = require("../checks/frameworks/expressChecks");
@@ -280,6 +281,28 @@ JWT_SECRET=your_secret`
     statsManager.addWarning();
 
     scoreManager.deduct("security", 20);
+
+    const securityWarnings = securityScanner(".");
+
+    securityWarnings.forEach((warning) => {
+
+        if (!isJsonMode) {
+
+            logger.warning(warning);
+        }
+
+        results.push({
+            type: "warning",
+            message: warning
+        });
+
+        statsManager.addWarning();
+
+        scoreManager.deduct(
+            "security",
+            5
+        );
+    });
 }
 
 /* framework detection */

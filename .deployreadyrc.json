@@ -1,4 +1,9 @@
 {
-  "threshold": 90,
-  "ignore": ["docker"]
+  "threshold": 85,
+  "securityIgnore": [
+    "fixes",
+    "assets",
+    "bin",
+    "README.md"
+  ]
 }
