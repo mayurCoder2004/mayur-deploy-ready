@@ -3,6 +3,8 @@
 const logger = require("../utils/logger");
 const config = require("../utils/scoreManager.js");
 const scoreConfig = require("../utils/scoreConfig");
+const loadConfig = require("../utils/loadConfig");
+const appConfig = loadConfig();
 
 const command = process.argv[2];
 const isJsonMode = process.argv.includes("--json");
@@ -394,8 +396,13 @@ if (frameworks.includes("Express")) {
 }
 
 // Docker checks
-dockerWarnings.forEach((warning) => {
+if (
+    !appConfig?.ignore?.includes(
+        "docker"
+    )
+) {
 
+    dockerWarnings.forEach((warning) => {
     if (!isJsonMode) {
 
         logger.warning(warning);
@@ -417,6 +424,7 @@ dockerWarnings.forEach((warning) => {
             );
         }
     }
+    
 
     results.push({
         type: "warning",
@@ -426,7 +434,8 @@ dockerWarnings.forEach((warning) => {
     statsManager.addWarning();
 
     scoreManager.deduct("docker", 5);
-});
+    });
+}
 
 /* Platform deployment checks */
 
@@ -521,7 +530,9 @@ Object.entries(categoryScores)
 
 /* FINAL STATUS */
 
-if (finalScore >= 85) {
+const threshold = appConfig?.threshold || 85;
+
+if (finalScore >= threshold) {
 
     console.log("🟢 Production Ready");
 
