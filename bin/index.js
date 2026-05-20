@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 const logger = require("../utils/logger");
+const config = require("../utils/scoreManager.js");
+const scoreConfig = require("../utils/scoreConfig");
 
 const command = process.argv[2];
 const isJsonMode = process.argv.includes("--json");
@@ -108,7 +110,7 @@ if (packageCheck()) {
 
     statsManager.addError();
 
-    scoreManager.deduct(25);
+    scoreManager.deduct("package", 25);
 }
 
 /* build script check */
@@ -144,7 +146,7 @@ if (buildCheck()) {
 
     statsManager.addWarning();
 
-    scoreManager.deduct(10);
+    scoreManager.deduct("scripts", 10);
 }
 
 /* .gitignore check */
@@ -170,7 +172,7 @@ dist`
 
     statsManager.addError();
 
-    scoreManager.deduct(15);
+    scoreManager.deduct("gitignore", 15);
 
 } else {
 
@@ -204,7 +206,7 @@ dist`
 
         statsManager.addWarning();
 
-        scoreManager.deduct(5);
+        scoreManager.deduct("gitignore", 5);
     }
 
     if (!gitignore.hasEnv) {
@@ -226,7 +228,7 @@ dist`
 
         statsManager.addWarning();
 
-        scoreManager.deduct(10);
+        scoreManager.deduct("gitignore", 10);
     }
 }
 
@@ -275,7 +277,7 @@ JWT_SECRET=your_secret`
 
     statsManager.addWarning();
 
-    scoreManager.deduct(20);
+    scoreManager.deduct("security", 20);
 }
 
 /* framework detection */
@@ -308,7 +310,7 @@ if (frameworks && frameworks.length > 0) {
 
     statsManager.addWarning();
 
-    scoreManager.deduct(10);
+    scoreManager.deduct("framework", 10);
 }
 
 /* React checks */
@@ -347,7 +349,7 @@ if (frameworks.includes("React")) {
 
         statsManager.addWarning();
 
-        scoreManager.deduct(5);
+        scoreManager.deduct("framework", 5);
     });
 }
 
@@ -387,7 +389,7 @@ if (frameworks.includes("Express")) {
 
         statsManager.addWarning();
 
-        scoreManager.deduct(5);
+        scoreManager.deduct("framework", 5);
     });
 }
 
@@ -423,7 +425,7 @@ dockerWarnings.forEach((warning) => {
 
     statsManager.addWarning();
 
-    scoreManager.deduct(5);
+    scoreManager.deduct("docker", 5);
 });
 
 /* Platform deployment checks */
@@ -464,12 +466,12 @@ platformWarnings.forEach((warning) => {
 
     statsManager.addWarning();
 
-    scoreManager.deduct(5);
+    scoreManager.deduct("platform", 5);
 });
 
 /* FINAL RESULTS */
 
-const finalScore = scoreManager.getScore();
+const finalScore = scoreManager.getTotalScore();
 const stats = statsManager.getStats();
 
 /* JSON MODE */
@@ -499,6 +501,26 @@ console.log(`
 ❌ Errors: ${stats.errors}
 `);
 
+/* CATEGORY SCORES */
+
+const categoryScores =
+    scoreManager.getCategoryScores();
+
+console.log(`
+📦 Category Scores
+━━━━━━━━━━━━━━━━━━━━━━
+`);
+
+Object.entries(categoryScores)
+.forEach(([key, value]) => {
+
+    console.log(
+        `${key.toUpperCase()}: ${value}/${scoreConfig[key]}`
+    );
+});
+
+/* FINAL STATUS */
+
 if (finalScore >= 85) {
 
     console.log("🟢 Production Ready");
@@ -510,18 +532,4 @@ if (finalScore >= 85) {
 } else {
 
     console.log("🔴 Unsafe Deployment");
-}
-
-/* CI/CD MODE */
-
-if (isCiMode) {
-
-    if (finalScore >= 85) {
-
-        process.exit(0);
-
-    } else {
-
-        process.exit(1);
-    }
 }
