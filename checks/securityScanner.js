@@ -137,9 +137,16 @@ function scanFile(filePath) {
                 pattern.regex.test(content)
             ) {
 
-                warnings.push(
-                    `Potential ${pattern.name} detected in ${filePath}`
-                );
+                warnings.push({
+                    message:
+                        `Potential ${pattern.name} detected in ${filePath}`,
+
+                    severity:
+                        pattern.severity,
+
+                    deduction:
+                        pattern.deduction
+                });
             }
         });
 

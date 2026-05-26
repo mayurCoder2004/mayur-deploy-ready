@@ -1,9 +1,9 @@
 module.exports = {
-    package: 30,
-    scripts: 15,
+    package: 20,
+    scripts: 20,
     gitignore: 10,
     security: 25,
-    docker: 15,
+    docker: 10,
     framework: 10,
-    platform: 10
+    platform: 5
 };

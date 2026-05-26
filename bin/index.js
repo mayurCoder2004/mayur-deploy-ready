@@ -280,27 +280,28 @@ JWT_SECRET=your_secret`
 
     statsManager.addWarning();
 
-    scoreManager.deduct("security", 20);
-
     const securityWarnings = securityScanner(".");
 
     securityWarnings.forEach((warning) => {
 
         if (!isJsonMode) {
 
-            logger.warning(warning);
+            logger.warning(
+                `${warning.severity.toUpperCase()}: ${warning.message}`
+            );
         }
 
         results.push({
             type: "warning",
-            message: warning
+            severity: warning.severity,
+            message: warning.message
         });
 
         statsManager.addWarning();
 
         scoreManager.deduct(
             "security",
-            5
+            warning.deduction
         );
     });
 }
@@ -551,11 +552,21 @@ Object.entries(categoryScores)
     );
 });
 
+const hasCriticalIssues =
+    results.some((result) =>
+        result.message.includes("Build script missing") ||
+        result.message.includes(".env missing") ||
+        result.message.includes("package.json missing")
+    );
+
 /* FINAL STATUS */
 
 const threshold = appConfig?.threshold || 85;
 
-if (finalScore >= threshold) {
+if (
+    finalScore >= threshold &&
+    !hasCriticalIssues
+) {
 
     console.log("🟢 Production Ready");
 
